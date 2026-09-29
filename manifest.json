@@ -1,0 +1,10 @@
+{
+    "name": "TooManyEmotesAddonFix",
+    "version_number": "0.1.0",
+    "website_url": "https://github.com/Davesc0/TooManyEmotesAddonFix",
+    "description": "Fixes TooManyEmotes addons like Alone's: their emotes get a rarity tier and must be bought, and the base emotes they break (props, poses, random emotes) work again.",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100",
+        "FlipMods-TooManyEmotes-2.3.17"
+    ]
+}
