@@ -11,9 +11,12 @@ Fixes two problems with TooManyEmotes addons like
 Works with new emotes from addon updates without needing an update itself. Also shows up in
 Y4NGZUpgrades' emote menu.
 
+In the config you can keep addon emotes unlocked (they still get a tier), change how long an
+emote has to be for each tier, or set the tier of single emotes by name.
+
 ## Notes
 
-- Everyone in the lobby needs it.
+- Everyone in the lobby needs it, with the same config.
 - Tested with Alone's TooManyEmotes, other addons should work too.
 - AI-assisted mod. Tested in a lightweight profile and in a ~260-mod modpack.
 - Found a bug? Open an issue.

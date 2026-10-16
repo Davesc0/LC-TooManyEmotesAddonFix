@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>TooManyEmotesAddonFix</AssemblyName>
-		<Description>Fixes TooManyEmotes addons: their emotes get a rarity tier and must be bought, and the base emotes they break work again.</Description>
-		<Version>0.1.0</Version>
+		<Description>Fixes TooManyEmotes addons.</Description>
+		<Version>0.2.0</Version>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
@@ -15,7 +15,7 @@
 		<PackageReference Include="LethalCompany.GameLibs.Steam" Version="81.0.5-ngd.0" />
 	</ItemGroup>
 
-	<!-- TooManyEmotes isn't on NuGet, copy TooManyEmotes.dll into lib/ from your install. Not shipped with the mod. -->
+	<!-- TooManyEmotes isn't on NuGet, copy TooManyEmotes.dll into lib/. Not shipped with the mod. -->
 	<ItemGroup>
 		<Reference Include="TooManyEmotes">
 			<HintPath>..\lib\TooManyEmotes.dll</HintPath>

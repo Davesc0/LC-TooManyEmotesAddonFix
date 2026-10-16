@@ -5,16 +5,15 @@ using UnityEngine;
 
 namespace TooManyEmotesAddonFix
 {
-    // Finds TME's own emote bundles among the loaded ones.
     internal static class BaseBundles
     {
         static readonly string[] emoteBundles =
             { "emotes_0", "emotes_1", "emotes_2", "emotes_3", "emotes_complementary", "emotes_special" };
 
-        // base free emotes, leave these alone
+        // TME's own free emotes
         static readonly string[] freeBundles = { "emotes_complementary", "emotes_special" };
 
-        // clip + its original name (asset path file name, lowercase)
+        // original name = the file name in the asset path
         internal static List<(AnimationClip clip, string originalName)> Clips { get; private set; }
         internal static HashSet<AnimationClip> AllClips { get; private set; }
         internal static HashSet<AnimationClip> FreeClips { get; private set; }

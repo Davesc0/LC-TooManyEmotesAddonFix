@@ -4,15 +4,12 @@ using TooManyEmotes;
 
 namespace TooManyEmotesAddonFix
 {
-    // Addons (like Alone's) dump their clips into TME's complementary list, so they end up
-    // free and unlocked for everyone. This turns them into normal store emotes with a tier.
-    // No emote names hardcoded, so new emotes from addon updates just work.
+    [HarmonyPatch]
     internal static class AddonTiers
     {
-        // clip length in seconds: <7 common, <14 rare, <28 epic, rest legendary
-        static readonly float[] tierFloors = { 7f, 14f, 28f };
+        static readonly List<UnlockableEmote> addonEmotes = new List<UnlockableEmote>();
 
-        // internal in TME, new sessions copy the free list from this
+        // new sessions copy the free list from this
         static readonly AccessTools.FieldRef<List<UnlockableEmote>> complementaryEmotesDefault =
             AccessTools.StaticFieldRefAccess<List<UnlockableEmote>>(AccessTools.Field(typeof(EmotesManager), "complementaryEmotesDefault"));
 
@@ -21,15 +18,21 @@ namespace TooManyEmotesAddonFix
             if (EmotesManager.allUnlockableEmotes == null || !BaseBundles.Found)
                 return;
 
+            float[] floors = Settings.TierFloors();
+            Dictionary<string, int> overrides = Settings.ParseOverrides();
+            addonEmotes.Clear();
             int[] counts = new int[4];
             foreach (UnlockableEmote emote in EmotesManager.allUnlockableEmotes)
             {
+                // addon emotes = free emotes that didn't come from TME's own bundles
                 if (!emote.complementary || emote.animationClip == null || BaseBundles.FreeClips.Contains(emote.animationClip))
                     continue;
 
                 emote.complementary = false;
-                emote.rarity = TierFor(emote);
                 emote.displayName = OriginalCaseName(emote);
+                if (!overrides.TryGetValue(emote.displayName, out emote.rarity))
+                    emote.rarity = TierFor(emote, floors);
+                addonEmotes.Add(emote);
                 TierList(emote.rarity).Add(emote);
                 complementaryEmotesDefault()?.Remove(emote);
                 EmotesManager.complementaryEmotes?.Remove(emote);
@@ -41,7 +44,16 @@ namespace TooManyEmotesAddonFix
                 Plugin.mlg.LogInfo($"Tiered {total} addon emotes: {counts[0]} Common, {counts[1]} Rare, {counts[2]} Epic, {counts[3]} Legendary.");
         }
 
-        static int TierFor(UnlockableEmote emote)
+        // every reset of the unlocked list ends up here, host and client
+        [HarmonyPatch(typeof(SessionManager), nameof(SessionManager.ResetEmotesLocal))]
+        [HarmonyPostfix]
+        static void UnlockFreeAddonEmotes()
+        {
+            if (!Settings.MustBeBought.Value)
+                SessionManager.UnlockEmotesLocal(addonEmotes);
+        }
+
+        static int TierFor(UnlockableEmote emote, float[] tierFloors)
         {
             float length = emote.animationClip.length;
             if (emote.transitionsToClip != null)
@@ -53,8 +65,7 @@ namespace TooManyEmotesAddonFix
             return tier;
         }
 
-        // TME lowercases everything after the first letter ("Moves like jagger"), use the clip name instead.
-        // list is sorted case-insensitive so this doesn't mess up the order
+        // TME lowercases names ("Moves like jagger"), so use the clip name
         static string OriginalCaseName(UnlockableEmote emote)
         {
             string name = emote.emoteSyncGroupName != "" ? emote.emoteSyncGroupName : emote.emoteName;

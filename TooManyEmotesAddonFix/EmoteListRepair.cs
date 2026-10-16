@@ -10,12 +10,8 @@ using UnityEngine;
 
 namespace TooManyEmotesAddonFix
 {
-    /*  Addons call BuildEmotesList again to add their emotes, which breaks some base emotes:
-        -the first build renames clips (praise_the_sun_pose -> praise_the_sun), so the second one
-        misses the _pose / .random. / .layer_N. markers -> broken poses, random emotes, band emotes
-        - all emotes get recreated, so props/music TME set up after its build are lost */
-
-    // Fix: restore the original clip names, build again, rerun TME's setup, put back addon settings.
+    // addons call BuildEmotesList a second time, but the first build renamed the clips
+    // (praise_the_sun_pose -> praise_the_sun), so poses, random emotes and props break
     [HarmonyPatch]
     internal static class EmoteListRepair
     {
@@ -45,8 +41,7 @@ namespace TooManyEmotesAddonFix
             Plugin.mlg.LogInfo($"Emote list repaired and tiered in {timer.ElapsedMilliseconds} ms.");
         }
 
-        // in case an addon loading after this mod rebuilds the list too.
-        // grab addon settings before the old emote objects are thrown away
+        // an addon loading after this mod can rebuild the list too
         [HarmonyPatch(typeof(EmotesManager), nameof(EmotesManager.BuildEmotesList))]
         [HarmonyPrefix]
         static void BeforeBuild()
@@ -91,8 +86,7 @@ namespace TooManyEmotesAddonFix
             }
         }
 
-        // same steps TME runs in Awake after its build.
-        // props still point to the old emote objects, clear those first
+        // props still point to the old emote objects
         static void RerunBaseSetup()
         {
             if (emotePropsData?.GetValue(null) is IEnumerable props)
@@ -131,7 +125,6 @@ namespace TooManyEmotesAddonFix
             }
         }
 
-        // stuff an addon might set on its emotes after building
         readonly struct AddonEmoteSettings
         {
             readonly bool boomboxAudio;

@@ -12,12 +12,13 @@ namespace TooManyEmotesAddonFix
     {
         public const string modGUID = "dev.davesco.TooManyEmotesAddonFix";
         public const string modName = "TooManyEmotesAddonFix";
-        public const string modVersion = "0.1.0";
+        public const string modVersion = "0.2.0";
         private Harmony _harmony = new Harmony(modGUID);
         internal static ManualLogSource mlg = BepInEx.Logging.Logger.CreateLogSource(modGUID);
 
         void Awake()
         {
+            Settings.Init(Config);
             _harmony.PatchAll();
             EmoteListRepair.AtStartup();
 
